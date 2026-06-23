@@ -44,9 +44,9 @@ public class FileOrganizer {
     
     
 
-    public static void processFiles(JTextArea logArea) {
-        Path sourceDirectory = Paths.get(System.getProperty("user.home"), "Downloads");
-        File folder = sourceDirectory.toFile();
+    // Notice it now accepts the selected folder AND the dynamic map!
+    public static void processFiles(JTextArea logArea, Path selectedDirectory, Map<String, String> dynamicRules) {
+        File folder = selectedDirectory.toFile();
         File[] listOfFiles = folder.listFiles();
 
         if (listOfFiles == null) {
@@ -62,7 +62,7 @@ public class FileOrganizer {
                 
                 if (FILE_TYPES.containsKey(extension)) {
                     String targetFolder = FILE_TYPES.get(extension);
-                    Path targetDir = sourceDirectory.resolve(targetFolder);
+                    Path targetDir = selectedDirectory.resolve(targetFolder);
                     
                     try {
                         if (!Files.exists(targetDir)) {
