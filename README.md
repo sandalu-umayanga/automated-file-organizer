@@ -271,7 +271,7 @@ Compile all .java files  (run from project root):
 javac -d out $(find src -name "*.java")
 
 Create the manifest:
-Main-Class: com.yourname.organizer.FileOrganizer
+echo "Main-Class: com.yourname.organizer.FileOrganizer" > manifest.txt
 A manifest file tells Java information about the JAR file.
 
 Without a manifest, Java sees the JAR as just a collection of .class files and doesn't know which class to
