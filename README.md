@@ -1,282 +1,504 @@
+# 🗂️ Automated File Organizer
 
-# Automated File Organizer
+<div align="center">
 
+![Java](https://img.shields.io/badge/Java-14%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![GUI](https://img.shields.io/badge/UI-Java%20Swing-orange?style=for-the-badge)
 
-A lightweight, cross-platform Java utility that automatically scans your `Downloads` folder and neatly organizes your files into subdirectories (Documents, Images, Archives, etc.) based on their file extensions.
+**A cross-platform Java desktop application that automatically organizes your files into categorized folders based on file extension rules you define.**
+
+[📥 Download Installer](#-installation) · [🛠️ Build from Source](#️-building-from-source) · [📖 How It Works](#️-how-it-works) · [🤝 Contributing](#-contributing)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Screenshots / Preview](#-screenshots--preview)
+- [Installation](#-installation)
+  - [Linux (.deb)](#-linux-deb-package)
+  - [Windows (.exe)](#-windows-exe-installer)
+- [Usage](#-usage)
+- [How It Works](#️-how-it-works)
+  - [Default File Categories](#default-file-categories)
+  - [Architecture](#architecture)
+- [Building from Source](#️-building-from-source)
+  - [Prerequisites](#prerequisites)
+  - [Step 1 – Compile the Source](#step-1--compile-the-source)
+  - [Step 2 – Package into a JAR](#step-2--package-into-a-jar)
+  - [Step 3 – Create Native Installers](#step-3--create-native-installers-optional)
+- [Project Structure](#-project-structure)
+- [Configuration & Customization](#-configuration--customization)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+
+---
+
+## 🔍 Overview
+
+**Automated File Organizer** is a lightweight, zero-dependency Java desktop utility with a clean Swing GUI. Point it at any folder (defaults to your `~/Downloads` directory), define custom extension-to-folder rules, and click a button — it will automatically sort every file into its correct subfolder.
+
+The application follows a clean **MVC-inspired separation of concerns**:
+- `FileOrganizer.java` — pure file-moving business logic
+- `GUIFileOrganizer.java` — all Swing UI and event handling
+
+---
 
 ## 🚀 Features
 
-- **Cross-Platform Compatibility**: Works seamlessly on Windows, macOS, and Linux by dynamically resolving the user's home directory.
-- **Zero Dependencies**: Built entirely using vanilla Java (`java.nio.file`) without any external library dependencies.
-- **Pre-Built Installers**: Available as ready-to-use `.deb` (Linux) and `.exe` (Windows) installers.
-- **Intelligent Categorization**: Automatically groups files by their extensions into sensible folders like `Images`, `Documents`, `Installers`, `Archives`, and `Code`.
-- **Safe Operations**: Utilizes robust file moving operations to relocate files safely.
+| Feature | Description |
+|---|---|
+| 🖥️ **Graphical Interface** | Intuitive Java Swing GUI — no terminal required |
+| 📁 **Custom Folder Targeting** | Browse and select any folder on your system, not just `Downloads` |
+| ➕ **Dynamic Rule Management** | Add custom extension → folder rules at runtime without restarting |
+| 🧠 **Intelligent Categorization** | Sensible built-in defaults for Documents, Images, Archives, Code, and more |
+| 🔒 **Safe File Operations** | Uses `java.nio.file.Files.move()` with `REPLACE_EXISTING` for reliable moves |
+| 📜 **Live Activity Log** | In-app scrollable log shows every move, skip, and error in real time |
+| 🌍 **Cross-Platform** | Runs on Windows, Linux, and macOS — resolves `user.home` dynamically |
+| 📦 **Zero Dependencies** | Built entirely on the Java standard library (`java.nio`, `javax.swing`) |
+| 🏗️ **Native Installers** | Pre-built `.deb` (Ubuntu/Debian) and `.exe` (Windows) packages available |
+
+---
+
+## 🖼️ Screenshots / Preview
+
+> The application opens a 750×500 window with three main areas:
+>
+> - **Top Panel** — Folder path selector (Browse button) and rule addition fields
+> - **Center Panel** — Scrollable live log showing active rules and file operation results
+> - **Bottom Panel** — Large "Organize Selected Folder!" action button
+
+```
+┌──────────────────────────────────────────────────┐
+│  Target Folder: [/home/user/Downloads      ] [Browse]  │
+│  Extension: [txt] Move to Folder: [TextFiles] [Add Rule]│
+├──────────────────────────────────────────────────┤
+│ Logs & Active Rules                               │
+│  Active Rules Loaded:                             │
+│    .pdf -> [Documents]                            │
+│    .jpg -> [Images]                               │
+│    .png -> [Images]                               │
+│    .zip -> [Archives]                             │
+│  --------------------------------------------------│
+│  🚀 Starting cleanup in: /home/user/Downloads     │
+│  ✅ Moved: resume.pdf -> Documents                │
+│  ✅ Moved: photo.jpg -> Images                    │
+│  ⚠️  Ignored: unknown.xyz (No rule for xyz)       │
+│  Done! Check your folder.                         │
+├──────────────────────────────────────────────────┤
+│         [ Organize Selected Folder! ]              │
+└──────────────────────────────────────────────────┘
+```
+
+---
 
 ## 📥 Installation
 
-You can download the pre-built `.deb` (Linux) or `.exe` (Windows) installers directly from the releases in this repository!
+### 🐧 Linux (.deb Package)
+
+Download the pre-built Debian package and install with `dpkg`:
+
+```bash
+# Download from the Releases section of this repository
+sudo dpkg -i fileorganizer_1.0_amd64.deb
+```
+
+After installation, launch it from your app menu by searching **"FileOrganizer"** or **"Dynamic File Organizer"**, or run it from the terminal:
+
+```bash
+/opt/dynamicfileorganizer/bin/DynamicFileOrganizer
+```
+
+> **Tip:** If no app menu entry appears, the installer was built without the `--linux-shortcut` flag. See [Troubleshooting](#-troubleshooting) for how to create a shortcut manually.
+
+---
+
+### 🪟 Windows (.exe Installer)
+
+Download `FileOrganizer-1.0.exe` from the Releases section and run it as a standard Windows installer. It will install the application and set up a Start Menu entry automatically.
+
+---
+
+### ☕ Running from JAR (Cross-Platform)
+
+If you have Java 14+ installed, you can run the prebuilt JAR directly without installing anything:
+
+```bash
+java -jar FileOrganizer.jar
+```
+
+---
+
+## 📖 Usage
+
+1. **Launch** the application using one of the methods above.
+2. **Select a Target Folder** — click **Browse…** to choose any folder on your system. It defaults to `~/Downloads`.
+3. **Review Active Rules** — the log panel shows pre-loaded rules on startup.
+4. **Add Custom Rules** (optional) — enter a file extension (e.g., `txt`) and a destination folder name (e.g., `TextFiles`), then click **Add Rule**.
+5. **Organize!** — click **"Organize Selected Folder!"** and watch the live log as files are moved to their categorized subfolders.
+
+> **Note:** Only files in the *root* of the selected folder are processed. Files inside existing subdirectories are left untouched.
+
+---
 
 ## ⚙️ How It Works
 
-The tool categorizes files based on predefined mappings:
+### Default File Categories
 
-- **Documents**: `.pdf`, `.docx`, `.xlsx`, `.md`, `.txt`
-- **Images**: `.jpg`, `.jpeg`, `.png`
-- **Archives**: `.zip`
-- **Installers**: `.exe`
-- **Code**: `.sql`, `.tsx`
+When the application starts, the following built-in rules are active:
 
-When executed, it scans the `Downloads` directory, matches file extensions against the rules, creates any missing destination directories automatically, and physically moves the files to their respective target folders.
+| Extension | Destination Folder |
+|---|---|
+| `.pdf`, `.docx`, `.xlsx`, `.md` | `Documents` |
+| `.jpg`, `.jpeg`, `.png` | `Images` |
+| `.zip` | `Archives` |
+| `.exe` | `Installers` |
+| `.sql`, `.tsx` | `Code` |
+
+> **These rules can be extended at runtime** via the "Add Rule" panel without restarting. Rules are stored in a `HashMap<String, String>` and applied immediately to the next run.
+
+### How Files Are Moved
+
+For each file in the target folder:
+
+1. Extract the file extension (lowercased).
+2. Look up the extension in the active rules map.
+3. If a rule matches:
+   - Create the destination subdirectory inside the target folder (if it doesn't already exist).
+   - Move the file using `Files.move(..., StandardCopyOption.REPLACE_EXISTING)`.
+   - Log a ✅ success message.
+4. If no rule matches, log a ⚠️ ignored message and leave the file in place.
+5. If an error occurs (e.g., permission denied), log a ❌ error message and continue.
+
+---
+
+### Architecture
+
+The application uses a **two-class architecture** with clean separation of responsibilities:
+
+```
+src/
+└── com/yourname/organizer/
+    ├── FileOrganizer.java       ← Business Logic (file moving engine)
+    └── GUIFileOrganizer.java    ← Presentation Layer (Swing UI + event handling)
+```
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  GUIFileOrganizer.java                   │
+│                                                          │
+│  State: selectedDirectory, fileTypes (HashMap)           │
+│  Layout: JFrame → configPanel, scrollPane, runButton     │
+│  Events: browseButton, addRuleButton, runButton          │
+│                           │                             │
+│           on button click │                             │
+│                           ▼                             │
+│         FileOrganizer.processFiles(                     │
+│             logArea, selectedDirectory, fileTypes)       │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                   FileOrganizer.java                     │
+│                                                          │
+│  Input:  JTextArea (for logging), Path, Map<ext, folder> │
+│  Action: Iterates files, matches extensions, moves files │
+│  Output: Appends status lines to the provided JTextArea  │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Why this design?**
+- `FileOrganizer` has zero knowledge of buttons, windows, or UI components.
+- `GUIFileOrganizer` has zero file I/O logic — it only manages state and hands it off.
+- This makes the logic layer independently testable and reusable.
+
+---
 
 ## 🛠️ Building from Source
 
-If you want to build this project from source, you can compile it into a Runnable JAR file. Requires **Java 14+**.
+### Prerequisites
 
-### 1. Create an Executable JAR
+| Requirement | Version |
+|---|---|
+| Java Development Kit (JDK) | **14 or higher** |
+| Eclipse IDE *(optional)* | Any modern version |
+| WiX Toolset *(Windows installers only)* | v3.14 |
 
-Run these commands from the root directory of the project:
+---
 
-**Create output directory & compile:**
+### Step 1 – Compile the Source
+
+From the **project root directory**, compile all Java source files into the `out/` directory:
+
 ```bash
 mkdir -p out
 javac -d out $(find src -name "*.java")
 ```
 
-**Create the Manifest:**
-A manifest file tells Java which class contains the main method.
-
-On Linux/macOS:
-```bash
-echo "Main-Class: com.yourname.organizer.FileOrganizer" > manifest.txt
+**On Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Force -Path out
+Get-ChildItem -Recurse -Filter "*.java" src | ForEach-Object { $_.FullName } | javac -d out @args
 ```
-On Windows (PowerShell):
+
+---
+
+### Step 2 – Package into a JAR
+
+**Create or update the manifest** to declare the entry point:
+
+*Linux/macOS:*
+```bash
+echo "Main-Class: com.yourname.organizer.GUIFileOrganizer" > manifest.txt
+```
+
+*Windows (PowerShell):*
 ```powershell
 @"
 Manifest-Version: 1.0
-Main-Class: com.yourname.organizer.FileOrganizer
+Main-Class: com.yourname.organizer.GUIFileOrganizer
 
 "@ | Set-Content manifest.txt
 ```
 
-**Build the JAR:**
+**Bundle into a runnable JAR:**
 ```bash
 jar cfm FileOrganizer.jar manifest.txt -C out .
 ```
 
-### 2. Creating Native Installers (jpackage)
+**Run the JAR to verify:**
+```bash
+java -jar FileOrganizer.jar
+```
 
-**Note:** You must compile on the target OS (Compile on Windows for an `.exe`, compile on Linux for a `.deb`).
+---
 
-**Step 1: Workspace Setup**
-Create a clean directory structure so `jpackage` doesn't bundle your entire computer:
-```text
+### Step 3 – Create Native Installers (Optional)
+
+`jpackage` (bundled with JDK 14+) creates platform-native installers that include the Java runtime — no Java installation required on the target machine.
+
+> ⚠️ **Important:** You must compile the installer **on the target OS**. Build on Linux to get a `.deb`, build on Windows to get an `.exe`.
+
+**Setup the AppBuilder directory:**
+```
 AppBuilder/
 └── input/
-    └── FileOrganizer.jar
+    └── FileOrganizer.jar    ← Copy your JAR here
 ```
 
-**Step 2: Build the Installer**
-
-**🐧 On Linux (Generates a .deb package)**
-Navigate to your AppBuilder directory and run:
 ```bash
-jpackage --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
+mkdir -p AppBuilder/input
+cp FileOrganizer.jar AppBuilder/input/
+cd AppBuilder
 ```
 
-**🪟 On Windows (Generates an .exe or .msi)**
-*Important Prerequisite:* Windows requires the WiX Toolset v3.14 to create installers.
-If WiX is installed but `jpackage` fails, add it to your PATH:
+---
+
+#### 🐧 Linux — Generate a `.deb` Package
+
+```bash
+jpackage \
+  --name DynamicFileOrganizer \
+  --input input \
+  --main-jar FileOrganizer.jar \
+  --main-class com.yourname.organizer.GUIFileOrganizer \
+  --linux-shortcut \
+  --linux-app-category Utility
+```
+
+> The `--linux-shortcut` flag creates an app menu entry so the application appears in your Ubuntu/GNOME applications grid.
+
+Install the generated package:
+```bash
+sudo dpkg -i dynamicfileorganizer_1.0_amd64.deb
+```
+
+---
+
+#### 🪟 Windows — Generate a `.exe` / `.msi` Installer
+
+**Prerequisite:** Install [WiX Toolset v3.14](https://github.com/wixtoolset/wix3/releases) and add it to your PATH:
+
 ```powershell
-# Temporarily add WiX to PATH in PowerShell:
+# Temporarily add WiX to PATH
 $env:Path += ";C:\Program Files (x86)\WiX Toolset v3.14\bin"
 ```
-Once WiX is configured, run the packaging command:
-```bash
-jpackage --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
+
+Then run:
+```powershell
+jpackage `
+  --name FileOrganizer `
+  --input input `
+  --main-jar FileOrganizer.jar `
+  --main-class com.yourname.organizer.GUIFileOrganizer
 ```
 
-**⚡ Alternative: Windows App-Image (No WiX Required)**
-If you don't want to install WiX, you can generate a portable "App Image" instead of an installer. This creates a folder containing your `.exe` and the necessary runtime files.
+**Alternative: Portable App-Image (No WiX Required)**
+
+If you don't want to install WiX, generate a portable folder instead:
 ```bash
-jpackage --type app-image --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
+jpackage \
+  --type app-image \
+  --name FileOrganizer \
+  --input input \
+  --main-jar FileOrganizer.jar \
+  --main-class com.yourname.organizer.GUIFileOrganizer
 ```
-You can then zip the resulting `FileOrganizer` folder and share it directly!
+This produces a `FileOrganizer/` folder containing the `.exe` and Java runtime. Zip it and share directly — no installation needed!
 
+---
 
+## 📁 Project Structure
 
+```
+automated-file-organizer/
+│
+├── src/                                    # Java source code
+│   ├── module-info.java                    # Java module declaration (requires java.desktop)
+│   └── com/yourname/organizer/
+│       ├── FileOrganizer.java              # Business logic: file-moving engine
+│       └── GUIFileOrganizer.java           # Swing GUI: window, panels, event listeners
+│
+├── AppBuilder/                             # jpackage workspace (git-ignored)
+│   └── input/
+│       └── FileOrganizer.jar              # JAR input for jpackage
+│
+├── out/                                   # Compiled .class files (git-ignored)
+├── bin/                                   # Eclipse build output (git-ignored)
+│
+├── FileOrganizer.jar                      # Pre-built runnable JAR
+├── FileOrganizer-1.0.exe                  # Windows installer
+├── fileorganizer_1.0_amd64.deb           # Debian/Ubuntu installer
+│
+├── manifest.txt                           # JAR manifest (git-ignored)
+├── .gitignore
+└── README.md
+```
 
----------------------------------------------------------------------------------
+---
 
-Building the GUI Executable
-Step 1: The Blank Window (JFrame)
-In Java, a basic desktop window is called a JFrame. Before we add any buttons or logic, let's just tell Java to open an empty 600x400 window on your screen.
+## ⚙️ Configuration & Customization
 
-In Eclipse, right-click your package (com.yourname.organizer), create a New > Class, and name it GUIFileOrganizer.
+### Adding Rules at Runtime
 
-package com.yourname.organizer;
+In the running application:
+1. Type the file extension (without the dot) in the **"File Extension"** field, e.g. `mp4`
+2. Type the destination folder name in the **"Move to Folder"** field, e.g. `Videos`
+3. Click **Add Rule**
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+The new rule is active immediately for the next run.
 
-public class GUIFileOrganizer {
+### Modifying Built-in Default Rules
 
-    public static void main(String[] args) {
-        // Rule #1 of Java GUIs: Always start them on the "Event Dispatch Thread"
-        // This prevents the window from freezing or crashing.
-        SwingUtilities.invokeLater(() -> {
-            createAndShowGUI();
-        });
-    }
+To change the default rules that load at startup, edit the `static` block in [`FileOrganizer.java`](src/com/yourname/organizer/FileOrganizer.java) and the constructor of [`GUIFileOrganizer.java`](src/com/yourname/organizer/GUIFileOrganizer.java):
 
-    private static void createAndShowGUI() {
-        // 1. Create the window frame
-        JFrame frame = new JFrame("Magic File Organizer");
-        
-        // 2. Tell the program to stop running when you click the 'X' to close the window
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // 3. Set the size (Width: 600 pixels, Height: 400 pixels)
-        frame.setSize(600, 400);
-        
-        // 4. Center it on the screen
-        frame.setLocationRelativeTo(null);
-        
-        // 5. Make it visible!
-        frame.setVisible(true);
-    }
-}
+```java
+// In FileOrganizer.java static block:
+FILE_TYPES.put("mp4", "Videos");
+FILE_TYPES.put("mp3", "Music");
+FILE_TYPES.put("txt", "TextFiles");
 
-By default, Java tries to keep projects as tiny as possible. The tools to draw windows (like JFrame and Swing) are stored in a specific module called java.desktop. Because your project doesn't explicitly ask for permission to use that module, Java blocks you from accessing it.
+// In GUIFileOrganizer constructor (for GUI display on startup):
+fileTypes.put("mp4", "Videos");
+fileTypes.put("mp3", "Music");
+```
 
-Ask for Permission
-If you want to keep the module system active, you have to tell Java you need the desktop tools.
+### module-info.java
 
-Open the module-info.java file.
+The project uses the Java Platform Module System (JPMS). The module declaration grants access to the `java.desktop` module (required by Swing):
 
-Add this exact line inside the curly braces: requires java.desktop;
-
-It should look something like this:
+```java
 module AutomatedFileOrganizer {
     requires java.desktop;
 }
+```
 
+---
 
-Step 2: The Button and Text Area
+## 🩺 Troubleshooting
 
+### App not appearing in Ubuntu app menu after `.deb` install
 
-Step 3 & 4: Connecting the Logic
-We need to add our organizeFiles method to the class and tell the button to call it when clicked.
+The `.deb` was built without the `--linux-shortcut` flag. Create a desktop entry manually:
 
-DRY (Don't Repeat Yourself) and Separation of Concerns. Instead of rewriting the logic, it is much better to have your GUI class call your existing FileOrganizer class.
+```bash
+sudo nano /usr/share/applications/fileorganizer.desktop
+```
 
-However, there is one small problem to solve: Your original FileOrganizer uses System.out.println(), which sends text to the hidden console. Your GUI text box has no way to "catch" that text.
+Paste:
+```ini
+[Desktop Entry]
+Name=Dynamic File Organizer
+Exec=/opt/dynamicfileorganizer/bin/DynamicFileOrganizer
+Icon=fileorganizer
+Type=Application
+Categories=Utility;
+```
 
-To connect them perfectly, you just need to make a tiny tweak to your original FileOrganizer class so it can push text to the GUI.
+Then refresh:
+```bash
+update-desktop-database ~/.local/share/applications/
+```
 
-Here is how you connect them:
+---
 
-1. Update FileOrganizer.java (The Brain)
-Change your main method into a public helper method that accepts a JTextArea. Now, instead of printing to the console, it appends text directly to whatever GUI asks for it!
+### "No such file or directory" when running the installed app
 
-Java
-package com.yourname.organizer;
+Linux is case-sensitive. The executable name matches the `--name` flag used during packaging exactly. Use tab-completion to find the exact path:
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.JTextArea; // Import this!
+```bash
+ls /opt/                          # Find the install folder name
+ls /opt/<foldername>/bin/         # Find the exact executable name
+/opt/<foldername>/bin/<ExeName>   # Run it
+```
 
-public class FileOrganizer {
-    
-    // ... (Keep your FILE_TYPES HashMap and getFileExtension method exactly the same) ...
+---
 
-    // Change "public static void main(String[] args)" to this:
-    public static void processFiles(JTextArea logArea) {
-        Path sourceDirectory = Paths.get(System.getProperty("user.home"), "Downloads");
-        File folder = sourceDirectory.toFile();
-        File[] listOfFiles = folder.listFiles();
+### `jpackage` fails on Windows
 
-        if (listOfFiles == null) {
-            logArea.append("❌ Could not find the Downloads directory!\n");
-            return;
-        }
-        
-        logArea.append("Cleaning up folder...\n");
+Ensure WiX Toolset v3.14 is installed and its `bin/` directory is on your PATH. Alternatively, use `--type app-image` to skip the installer and produce a portable folder instead.
 
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                String extension = getFileExtension(file);
-                
-                if (FILE_TYPES.containsKey(extension)) {
-                    String targetFolder = FILE_TYPES.get(extension);
-                    Path targetDir = sourceDirectory.resolve(targetFolder);
-                    
-                    try {
-                        if (!Files.exists(targetDir)) {
-                            Files.createDirectories(targetDir);
-                        }
-                        
-                        Path targetPath = targetDir.resolve(file.getName());
-                        Files.move(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        
-                        // Replaced System.out.println with logArea.append
-                        logArea.append("✅ Moved: " + file.getName() + " -> " + targetFolder + "\n");
-                        
-                    } catch (IOException e) {
-                        logArea.append("❌ Failed to move: " + file.getName() + "\n");
-                    }
-                } else {
-                    logArea.append("⚠️ Ignored: " + file.getName() + " (No rule for " + extension + ")\n");
-                }
-            }
-        }
-        logArea.append("\nDone! Check your folder.");
-    }
-}
-2. Update GUIFileOrganizer.java (The Visuals)
-Now, your GUI class doesn't need to know anything about HashMaps or Files.move. It just builds the window, and when the button is clicked, it hands the logArea over to FileOrganizer.
+---
 
-Java
-package com.yourname.organizer;
+### `java.awt.HeadlessException` on Linux servers
 
-import javax.swing.*;
-import java.awt.*;
+The application requires a graphical display environment. It is not designed to run in headless/SSH-only environments. If you need headless operation, use the original `FileOrganizer` command-line logic (refactored separately from the GUI class).
 
-public class GUIFileOrganizer {
+---
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> createAndShowGUI());
-    }
+## 🤝 Contributing
 
-    private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Magic File Organizer");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
-        frame.setLayout(new BorderLayout());
+Contributions are welcome! Here are some ideas for improvements:
 
-        JTextArea logArea = new JTextArea();
-        logArea.setEditable(false);
-        logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        JScrollPane scrollPane = new JScrollPane(logArea);
+- [ ] Persist custom rules to a JSON/properties config file
+- [ ] Add a "Preview Mode" that shows what would be moved without actually moving files
+- [ ] Support recursive organization of subdirectories
+- [ ] Add an undo feature to reverse the last run
+- [ ] Add system tray icon and minimize-to-tray support
+- [ ] Internationalization (i18n) for multiple languages
 
-        JButton runButton = new JButton("Clean My Downloads Folder!");
-        runButton.setFont(new Font("Arial", Font.BOLD, 16));
-        runButton.setPreferredSize(new Dimension(600, 50));
+**To contribute:**
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a Pull Request
 
-        // THE MAGIC CONNECTION:
-        runButton.addActionListener(e -> {
-            logArea.setText(""); // Clear the screen
-            // Call the other class and pass the logArea to it!
-            FileOrganizer.processFiles(logArea); 
-        });
+---
 
-        frame.add(runButton, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
-        
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
-}
-This is the exact architecture professional Java developers use. You have one class entirely dedicated to Logic (FileOrganizer), and one class entirely dedicated to User Interface (GUIFileOrganizer). They work together beautifully!
+## 📄 License
+
+This project is open source. See the repository for license details.
+
+---
+
+<div align="center">
+
+Built with ☕ Java and ❤️ — a practical tool for keeping your Downloads folder tidy.
+
+</div>
