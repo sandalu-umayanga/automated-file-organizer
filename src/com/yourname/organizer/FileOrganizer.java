@@ -102,5 +102,6 @@ public class FileOrganizer {
                 }
             }
         }
+        System.out.println("\nDone! Check your folder.");
     }
 }
