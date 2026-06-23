@@ -1,4 +1,4 @@
-\🧹 Automated File Organizer
+🧹 Automated File Organizer
 
 A lightweight, cross-platform Java utility that automatically scans your Downloads folder and neatly organizes your files into subdirectories (Documents, Images, Archives, etc.) based on their file extensions.
 
