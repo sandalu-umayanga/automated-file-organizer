@@ -1,8 +1,11 @@
 package com.yourname.organizer;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,12 +15,20 @@ public class FileOrganizer {
     private static final Map<String, String> FILE_TYPES = new HashMap<>();
 
     static {
-        // Add a few rules here based on what is actually in your folder!
         FILE_TYPES.put("pdf", "Documents");
+        FILE_TYPES.put("docx", "Documents");
+        FILE_TYPES.put("xlsx", "Documents");
+        FILE_TYPES.put("md", "Documents");
+        
         FILE_TYPES.put("jpg", "Images");
+        FILE_TYPES.put("jpeg", "Images");
         FILE_TYPES.put("png", "Images");
+        
+        FILE_TYPES.put("zip", "Archives");
         FILE_TYPES.put("exe", "Installers");
-        FILE_TYPES.put("txt", "Documents");
+        
+        FILE_TYPES.put("sql", "Code");
+        FILE_TYPES.put("tsx", "Code");
     }
 
     // 2. THE SLICER: A helper method to grab just the "jpg" or "pdf" part
@@ -52,7 +63,7 @@ public class FileOrganizer {
         }
         
         
-        System.out.println("Scanning and categorizing files...\n");
+        System.out.println("Cleaning up folder...\n");
         
         
 
@@ -65,7 +76,27 @@ public class FileOrganizer {
                 // Ask the HashMap: "Do you know what to do with this?"
                 if (FILE_TYPES.containsKey(extension)) {
                     String targetFolder = FILE_TYPES.get(extension);
-                    System.out.println("✅ Found '" + file.getName() + "'. It belongs in the [" + targetFolder + "] folder.");
+                    
+                // Define where the folder should be
+                    Path targetDir = sourceDirectory.resolve(targetFolder);
+                    
+                    try {
+                        // Create the "Documents" or "Images" folder if it doesn't exist
+                        if (!Files.exists(targetDir)) {
+                            Files.createDirectories(targetDir);
+                        }
+                        
+                        // Define the final destination for the file
+                        Path targetPath = targetDir.resolve(file.getName());
+                        
+                        // MOVE THE FILE!
+                        Files.move(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                        System.out.println("✅ Moved: " + file.getName() + " -> " + targetFolder);
+                        
+                    } catch (IOException e) {
+                        System.out.println("❌ Failed to move: " + file.getName());
+                    }
+                    
                 } else {
                     System.out.println("❌ Found '" + file.getName() + "'. I don't have a rule for this extension (" + extension + "). Ignoring.");
                 }
