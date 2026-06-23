@@ -253,3 +253,64 @@ public class FileOrganizer {
         }
     }
 }
+
+=============================================================================================================
+convert this in to executable file in windows or linux machine without java installed or installed
+
+
+create an executable JAR
+
+in project root
+Create an output directory:
+
+mkdir -p out
+
+
+Compile all .java files  (run from project root):
+
+javac -d out $(find src -name "*.java")
+
+Create the manifest:
+Main-Class: com.yourname.organizer.FileOrganizer
+A manifest file tells Java information about the JAR file.
+
+Without a manifest, Java sees the JAR as just a collection of .class files and doesn't know which class to
+
+
+Build the JAR:
+jar cfm FileOrganizer.jar manifest.txt -C out .
+--------------------------------------------------------------------
+Important Concept: You Must Compile on the Target OS
+
+Step 1: Verify your Java Version
+jpackage is included automatically in Java 14 and newer. Let's make sure your computer is ready.
+Open your terminal (Ubuntu) or Command Prompt (Windows) and type:
+
+jpackage --version
+
+
+Step 2: Set up your workspace (Crucial)
+jpackage will bundle everything it finds in your input folder into the final installer. To prevent it from accidentally bundling your whole computer, we need a clean workspace.
+
+create a new folder called AppBuilder.
+
+Inside AppBuilder, create another folder called input.
+
+Copy your exported FileOrganizer.jar file and paste it inside the input folder.
+
+Navigate to your AppBuilder folder using terminal
+
+
+Run this exact command (already  filled in  specific package and class names based on the code if you have any changes change them):
+jpackage --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
+
+
+Step 4: Test your new Native App!
+Once the command finishes, look inside your AppBuilder folder.
+
+If you ran this on Windows: You will see a FileOrganizer-1.0.exe or FileOrganizer-1.0.msi installer.
+
+If you ran this on Ubuntu: You will see a fileorganizer_1.0-1_amd64.deb installer.
+
+
+you can see the .deb installer in the repo also you can just download it and use it

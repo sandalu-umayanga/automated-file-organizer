@@ -2,3 +2,8 @@ bin/
 .settings/
 .classpath
 .project
+
+FileOrganizer.jar
+out/
+AppBuilder/
+manifest.txt
