@@ -436,3 +436,4 @@ If you ran this on Ubuntu: You will see a fileorganizer_1.0-1_amd64.deb installe
 
 
 you can see the .deb installer in the repo also you can just download it and use it
+you can see the .exe installer in the repo also you can just download it and use it
