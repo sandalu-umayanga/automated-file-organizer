@@ -8,7 +8,11 @@ public class FileOrganizer {
 
     public static void main(String[] args) {
         // 1. Point the program at your folder (UPDATE THIS PATH!)
-        Path sourceDirectory = Paths.get("C:/Users/YourName/Downloads");
+        // Path sourceDirectory = Paths.get("/home/snake/Downloads");
+        Path sourceDirectory = Paths.get(
+        	    System.getProperty("user.home"),
+        	    "Downloads"
+        	);
         
         // 2. Grab the folder and get a list of everything inside it
         File folder = sourceDirectory.toFile();

@@ -34,5 +34,24 @@ public class FileOrganizer {
         }
     }
 }
+
+
+Cross-platform version 
+
+For same code to work on both Windows and Linux without modification:
+
+Path sourceDirectory = Paths.get(
+    System.getProperty("user.home"),
+    "Downloads"
+);
+
+This resolves to:
+
+Windows → C:\Users\<username>\Downloads
+Linux → /home/<username>/Downloads
+
+
+
+
 ============================================================================
 
