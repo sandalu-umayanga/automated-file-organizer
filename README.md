@@ -271,14 +271,23 @@ Compile all .java files  (run from project root):
 javac -d out $(find src -name "*.java")
 
 Create the manifest:
-echo "Main-Class: com.yourname.organizer.FileOrganizer" > manifest.txt
+echo "Main-Class: com.yourname.organizer.FileOrganizer" > manifest.txt         ===> on linux
+
+on windows
+@"
+Manifest-Version: 1.0
+Main-Class: com.yourname.organizer.FileOrganizer
+
+"@ | Set-Content manifest.txt
+
+
 A manifest file tells Java information about the JAR file.
 
 Without a manifest, Java sees the JAR as just a collection of .class files and doesn't know which class to
 
 
 Build the JAR:
-jar cfm FileOrganizer.jar manifest.txt -C out .
+jar cfm FileOrganizer.jar manifest.txt -C out .      ==> linux
 --------------------------------------------------------------------
 Important Concept: You Must Compile on the Target OS
 
@@ -302,7 +311,120 @@ Navigate to your AppBuilder folder using terminal
 
 
 Run this exact command (already  filled in  specific package and class names based on the code if you have any changes change them):
+jpackage --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer    ===>  on linux
+
+on Windows
+Configure WiX
+
+WiX Toolset v3.14 is already installed.
+
+The issue is that the WiX bin directory is not on your PATH, so jpackage cannot find:
+
+candle.exe
+light.exe
+Step 1: Locate WiX executables
+
+Run:
+
+where candle
+where light
+
+If they are not found, check:
+
+dir "C:\Program Files (x86)\WiX Toolset v3.14\bin"
+
+You should see:
+
+candle.exe
+light.exe
+heat.exe
+Step 2: Add WiX to PATH
+
+Temporarily for the current PowerShell session:
+
+$env:Path += ";C:\Program Files (x86)\WiX Toolset v3.14\bin"
+
+Verify:
+
+candle -?
+light -?
+
+Both commands should display help information.
+
+Step 3: Permanently add WiX to PATH
+
+Add:
+
+C:\Program Files (x86)\WiX Toolset v3.14\bin
+
+to the Windows System PATH via:
+
+System Properties
+→ Advanced
+→ Environment Variables
+→ Path
+→ Edit
+→ New
+
+Then open a new PowerShell window.
+
+Verify:
+
+where candle
+where light
+
+Expected output:
+
+C:\Program Files (x86)\WiX Toolset v3.14\bin\candle.exe
+C:\Program Files (x86)\WiX Toolset v3.14\bin\light.exe
+Step 4: Build the installer
+
+Navigate to your AppBuilder directory and run:
+
 jpackage --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
+
+If WiX is correctly configured, jpackage should generate a Windows installer (.exe or .msi depending on the JDK version and defaults).
+
+Option 2: Create an application image only
+
+If you just want a runnable Windows application and not an installer:
+
+jpackage `
+  --type app-image `
+  --name FileOrganizer `
+  --input input `
+  --main-jar FileOrganizer.jar `
+  --main-class com.yourname.organizer.FileOrganizer
+
+This does not require WiX.
+
+It will create a folder containing:
+
+FileOrganizer/
+├── FileOrganizer.exe
+├── app/
+└── runtime/
+
+You can run FileOrganizer.exe directly.
+
+Check available package types
+
+Run:
+
+jpackage --help
+
+Look for:
+
+Valid package types:
+app-image
+exe
+msi
+
+If app-image works, then your Java setup and JAR are fine; only WiX is missing.
+
+For a student project, app-image is often enough. If you specifically need a Windows installer (.exe or .msi), install WiX and rerun jpackage.
+
+
 
 
 Step 4: Test your new Native App!
