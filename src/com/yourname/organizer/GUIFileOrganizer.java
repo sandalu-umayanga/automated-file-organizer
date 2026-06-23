@@ -1,6 +1,12 @@
 package com.yourname.organizer;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 public class GUIFileOrganizer {
@@ -16,17 +22,33 @@ public class GUIFileOrganizer {
     private static void createAndShowGUI() {
         // 1. Create the window frame
         JFrame frame = new JFrame("Magic File Organizer");
-        
-        // 2. Tell the program to stop running when you click the 'X' to close the window
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // 3. Set the size (Width: 600 pixels, Height: 400 pixels)
         frame.setSize(600, 400);
         
-        // 4. Center it on the screen
-        frame.setLocationRelativeTo(null);
+        // NEW: Tell the window how to arrange things. 
+        // BorderLayout lets us stick things to the top (NORTH), bottom (SOUTH), or middle (CENTER).
+        frame.setLayout(new BorderLayout());
+
+        // 2. Create the text area to show logs
+        JTextArea logArea = new JTextArea();
+        logArea.setEditable(false); // Make it read-only so the user can't type in it
         
-        // 5. Make it visible!
+        // Wrap the text area in a ScrollPane so we can scroll if there are too many files
+        JScrollPane scrollPane = new JScrollPane(logArea);
+        
+        
+        // 3. Create the action button
+        JButton runButton = new JButton("Clean My Downloads Folder!");
+        // Make the button tall enough to easily click
+        runButton.setPreferredSize(new Dimension(600, 50));
+        
+        
+        // 4. Add the components to the window frame
+        frame.add(runButton, BorderLayout.NORTH); // Stick button to the top
+        frame.add(scrollPane, BorderLayout.CENTER); // Let the text area fill the rest of the space
+        
+        // 5. Show it!
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }

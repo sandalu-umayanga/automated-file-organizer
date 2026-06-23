@@ -162,3 +162,7 @@ module AutomatedFileOrganizer {
 
 
 Step 2: The Button and Text Area
+
+
+Step 3 & 4: Connecting the Logic
+We need to add our organizeFiles method to the class and tell the button to call it when clicked.
