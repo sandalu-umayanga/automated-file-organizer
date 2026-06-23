@@ -9,6 +9,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JTextArea;
+
 public class FileOrganizer {
 	
 	// 1. THE BRAIN: Our dictionary of rules
@@ -42,66 +44,45 @@ public class FileOrganizer {
     
     
 
-    public static void main(String[] args) {
-        // Point the program at your folder (UPDATE THIS PATH!)
-        // Path sourceDirectory = Paths.get("/home/snake/Downloads");
-    	
-    	// Cross-platform version
-        Path sourceDirectory = Paths.get(
-        	    System.getProperty("user.home"),
-        	    "Downloads"
-        	);
-        
-        // Grab the folder and get a list of everything inside it
+    public static void processFiles(JTextArea logArea) {
+        Path sourceDirectory = Paths.get(System.getProperty("user.home"), "Downloads");
         File folder = sourceDirectory.toFile();
         File[] listOfFiles = folder.listFiles();
 
-        // Safety check: Did we find the folder?
         if (listOfFiles == null) {
-            System.out.println("Could not find the directory. Please check your path!");
-            return; // Stops the program
+            logArea.append("❌ Could not find the Downloads directory!\n");
+            return;
         }
         
-        
-        System.out.println("Cleaning up folder...\n");
-        
-        
+        logArea.append("Cleaning up folder...\n");
 
-        // 3. THE MATCHMAKER: Loop through files and check the rules
         for (File file : listOfFiles) {
             if (file.isFile()) {
-                // Slice off the extension
                 String extension = getFileExtension(file);
                 
-                // Ask the HashMap: "Do you know what to do with this?"
                 if (FILE_TYPES.containsKey(extension)) {
                     String targetFolder = FILE_TYPES.get(extension);
-                    
-                // Define where the folder should be
                     Path targetDir = sourceDirectory.resolve(targetFolder);
                     
                     try {
-                        // Create the "Documents" or "Images" folder if it doesn't exist
                         if (!Files.exists(targetDir)) {
                             Files.createDirectories(targetDir);
                         }
                         
-                        // Define the final destination for the file
                         Path targetPath = targetDir.resolve(file.getName());
-                        
-                        // MOVE THE FILE!
                         Files.move(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("✅ Moved: " + file.getName() + " -> " + targetFolder);
+                        
+                        // Replaced System.out.println with logArea.append
+                        logArea.append("✅ Moved: " + file.getName() + " -> " + targetFolder + "\n");
                         
                     } catch (IOException e) {
-                        System.out.println("❌ Failed to move: " + file.getName());
+                        logArea.append("❌ Failed to move: " + file.getName() + "\n");
                     }
-                    
                 } else {
-                    System.out.println("❌ Found '" + file.getName() + "'. I don't have a rule for this extension (" + extension + "). Ignoring.");
+                    logArea.append("⚠️ Ignored: " + file.getName() + " (No rule for " + extension + ")\n");
                 }
             }
         }
-        System.out.println("\nDone! Check your folder.");
+        logArea.append("\nDone! Check your folder.");
     }
 }

@@ -2,6 +2,7 @@ package com.yourname.organizer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,6 +33,7 @@ public class GUIFileOrganizer {
         // 2. Create the text area to show logs
         JTextArea logArea = new JTextArea();
         logArea.setEditable(false); // Make it read-only so the user can't type in it
+        logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         
         // Wrap the text area in a ScrollPane so we can scroll if there are too many files
         JScrollPane scrollPane = new JScrollPane(logArea);
@@ -42,6 +44,12 @@ public class GUIFileOrganizer {
         // Make the button tall enough to easily click
         runButton.setPreferredSize(new Dimension(600, 50));
         
+        // THE MAGIC CONNECTION:
+        runButton.addActionListener(e -> {
+            logArea.setText(""); // Clear the screen
+            // Call the other class and pass the logArea to it!
+            FileOrganizer.processFiles(logArea); 
+        });
         
         // 4. Add the components to the window frame
         frame.add(runButton, BorderLayout.NORTH); // Stick button to the top
