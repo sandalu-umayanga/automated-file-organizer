@@ -101,3 +101,64 @@ If you don't want to install WiX, you can generate a portable "App Image" instea
 jpackage --type app-image --name FileOrganizer --input input --main-jar FileOrganizer.jar --main-class com.yourname.organizer.FileOrganizer
 ```
 You can then zip the resulting `FileOrganizer` folder and share it directly!
+
+
+
+
+---------------------------------------------------------------------------------
+
+Building the GUI Executable
+Step 1: The Blank Window (JFrame)
+In Java, a basic desktop window is called a JFrame. Before we add any buttons or logic, let's just tell Java to open an empty 600x400 window on your screen.
+
+In Eclipse, right-click your package (com.yourname.organizer), create a New > Class, and name it GUIFileOrganizer.
+
+package com.yourname.organizer;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+public class GUIFileOrganizer {
+
+    public static void main(String[] args) {
+        // Rule #1 of Java GUIs: Always start them on the "Event Dispatch Thread"
+        // This prevents the window from freezing or crashing.
+        SwingUtilities.invokeLater(() -> {
+            createAndShowGUI();
+        });
+    }
+
+    private static void createAndShowGUI() {
+        // 1. Create the window frame
+        JFrame frame = new JFrame("Magic File Organizer");
+        
+        // 2. Tell the program to stop running when you click the 'X' to close the window
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // 3. Set the size (Width: 600 pixels, Height: 400 pixels)
+        frame.setSize(600, 400);
+        
+        // 4. Center it on the screen
+        frame.setLocationRelativeTo(null);
+        
+        // 5. Make it visible!
+        frame.setVisible(true);
+    }
+}
+
+By default, Java tries to keep projects as tiny as possible. The tools to draw windows (like JFrame and Swing) are stored in a specific module called java.desktop. Because your project doesn't explicitly ask for permission to use that module, Java blocks you from accessing it.
+
+Ask for Permission
+If you want to keep the module system active, you have to tell Java you need the desktop tools.
+
+Open the module-info.java file.
+
+Add this exact line inside the curly braces: requires java.desktop;
+
+It should look something like this:
+module AutomatedFileOrganizer {
+    requires java.desktop;
+}
+
+
+Step 2: The Button and Text Area
